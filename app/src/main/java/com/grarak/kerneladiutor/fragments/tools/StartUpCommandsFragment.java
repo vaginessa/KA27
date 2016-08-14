@@ -122,8 +122,8 @@ public class StartUpCommandsFragment extends RecyclerViewFragment {
                                                 }
                                                 case 1: {
                                                     AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                                                    builder.setMessage(getString(R.string.startup_commands_delete_all)).setPositiveButton(getString(R.string.startup_commands_delete_all_yes), dialogClickListener)
-                                                            .setNegativeButton(getString(R.string.startup_commands_delete_all_no), dialogClickListener).show();
+                                                    builder.setMessage(getString(R.string.startup_commands_delete_all)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+                                                            .setNegativeButton(getString(R.string.no), dialogClickListener).show();
                                                     break;
                                                 }
 

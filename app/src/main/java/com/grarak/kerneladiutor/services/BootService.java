@@ -49,6 +49,7 @@ import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.database.CommandDB;
 import com.grarak.kerneladiutor.utils.kernel.CPUVoltage;
+import com.grarak.kerneladiutor.utils.kernel.Thermal;
 import com.grarak.kerneladiutor.utils.kernel.Wake;
 import com.kerneladiutor.library.root.RootUtils;
 
@@ -83,6 +84,8 @@ public class BootService extends Service {
         final List<String> plugins = new ArrayList<>();
 
         CPUVoltage.storeVoltageTable(this);
+	// Default TODO
+	Thermal.storeThermalDefault(this);
 
         Class[] classes = {BatteryFragment.class, CPUFragment.class, CPUHotplugFragment.class,
                 CPUVoltageFragment.class, EntropyFragment.class, GPUFragment.class, IOFragment.class,

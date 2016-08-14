@@ -17,6 +17,8 @@
 package com.grarak.kerneladiutor.utils.kernel;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
@@ -536,7 +538,7 @@ public class Thermal implements Constants {
         return THERMAL_FILE != null;
     }
 
-    private static String getThermalFile(String file) {
+    public static String getThermalFile(String file) {
         return THERMAL_FILE + "/" + file;
     }
 
@@ -587,5 +589,39 @@ public class Thermal implements Constants {
     public static boolean hasThermalengine() {
         return Utils.hasProp(THERMAL_ENGINE);
     }
-
+    // Default TODO
+    public static boolean storeThermalDefault(Context context) {
+        SharedPreferences.Editor preferences = context.getSharedPreferences("thermal", 0).edit();
+        String temp = "empty";
+        if (Thermal.hasThermalengine()) {
+            preferences.putString("ThermalengineDefault", String.valueOf(isThermalengineActive()));
+            temp = "full";
+        }
+        if ((Thermal.hasThermalSettings()) && (Thermal.hasIntelliThermalEnable())) {
+            preferences.putString("IntelliThermalDefault", Utils.readFile(getThermalFile(PARAMETERS_ENABLED)));
+            temp = "full";
+        }
+        if (Thermal.hasLimitTempDegC()) {
+            preferences.putString("LimitTempDegCDefault", String.valueOf(getLimitTempDegC()));
+            temp = "full";
+        }
+        if (Thermal.hasCoreLimitTempDegC()) {
+            preferences.putString("CoreLimitTempDegCDefault", String.valueOf(getCoreLimitTempDegC()));
+            temp = "full";
+        }
+        if (Thermal.hasPollMs()) {
+            preferences.putString("PollMsDefault", String.valueOf(getPollMs()));
+            temp = "full";
+        }
+        if (temp.equals("full")) {
+            preferences.apply();
+            Utils.saveBoolean("ThermalDefault", true, context);
+            Log.w(TAG, "storeThermalDefault() is full");
+            return true;
+        } else {
+            Utils.saveBoolean("ThermalDefaultempty", true, context);
+            Log.w(TAG, "storeThermalDefault() is empty");
+            return false;
+        }
+    }
 }

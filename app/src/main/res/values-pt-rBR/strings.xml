@@ -6,6 +6,8 @@
   <string name="no_busybox">Busybox não disponível</string>
   <string name="ok">OK</string>
   <string name="cancel">Cancelar</string>
+  <string name="yes">Sim</string>
+  <string name="no">Não</string>
   <string name="current_value_not_supported">O Valor atual não é suportado</string>
   <string name="select_picture">Selecione imagem</string>
   <string name="no_picture">Sem imagem</string>
@@ -79,8 +81,6 @@
   <string name="startup_commands_list_info">Clique num comando para escolher entre copiar ou deletar o comando da lista.</string>
   <string name="all_startup_commands">Clique neste para copiar ou deletar todos comandos da lista abaixo salva.</string>
   <string name="startup_commands_delete_all">Tem certeza que deseja deletar todos comandos de inicialização.</string>
-  <string name="startup_commands_delete_all_yes">Sim</string>
-  <string name="startup_commands_delete_all_no">Não</string>
   <string name="startup_commands_none">Nenhum comando de inicialização encontrado.</string>
   
   <!-- Frequency Table -->

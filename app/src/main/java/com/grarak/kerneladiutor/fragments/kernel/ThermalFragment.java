@@ -16,11 +16,16 @@
 
 package com.grarak.kerneladiutor.fragments.kernel;
 
+import android.support.v7.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.elements.DAdapter;
 import com.grarak.kerneladiutor.elements.DDivider;
+import com.grarak.kerneladiutor.elements.cards.CardViewItem;
 import com.grarak.kerneladiutor.elements.cards.InformationCardView;
 import com.grarak.kerneladiutor.elements.cards.PopupCardView;
 import com.grarak.kerneladiutor.elements.cards.SeekBarCardView;
@@ -29,9 +34,14 @@ import com.grarak.kerneladiutor.fragments.RecyclerViewFragment;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.kernel.CPU;
 import com.grarak.kerneladiutor.utils.kernel.Thermal;
+import com.grarak.kerneladiutor.utils.Constants;
+import com.grarak.kerneladiutor.utils.root.Control;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import android.widget.Toast;
 /**
@@ -39,6 +49,10 @@ import android.widget.Toast;
  */
 public class ThermalFragment extends RecyclerViewFragment implements SwitchCardView.DSwitchCard.OnDSwitchCardListener,
         SeekBarCardView.DSeekBarCard.OnDSeekBarCardListener, PopupCardView.DPopupCard.OnDPopupCardListener {
+    private CardViewItem.DCardView mDefaultCard;
+    Map<String, String> defaultlist = new HashMap<String, String>();
+    private static String termal_default = "", termal_engine_default = "", intellithermal_default = "",
+	limittempdegc_default = "", corelimittempdegc_default = "", pollms_default = "";
 
     private SwitchCardView.DSwitchCard mThermaldCard;
 
@@ -79,7 +93,10 @@ public class ThermalFragment extends RecyclerViewFragment implements SwitchCardV
     @Override
     public void init(Bundle savedInstanceState) {
         super.init(savedInstanceState);
-
+	// Default TODO
+	/*Thermal.storeThermalDefault(getContext());*/
+	
+	checkdefault(getActivity());
         final InformationCardView.DInformationCard mInformationCard = new InformationCardView.DInformationCard();
         mInformationCard.setText(getString(R.string.thermal_info));
 
@@ -191,19 +208,6 @@ public class ThermalFragment extends RecyclerViewFragment implements SwitchCardV
 		    addView(mCoreLimitTempDegCCard);
 		}
 
-		if (Thermal.hasCoreTempHysteresisDegC()) {
-		    List<String> list = new ArrayList<>();
-		    for (double i = 0; i < 21; i++)
-		        list.add(Utils.formatCelsius(i) + " " + Utils.celsiusToFahrenheit(i));
-
-		    mCoreTempHysteresisDegCCard = new SeekBarCardView.DSeekBarCard(list);
-		    mCoreTempHysteresisDegCCard.setTitle(getString(R.string.core_temp_hysteresis));
-		    mCoreTempHysteresisDegCCard.setProgress(Thermal.getCoreTempHysteresisDegC());
-		    mCoreTempHysteresisDegCCard.setOnDSeekBarCardListener(this);
-
-		    addView(mCoreTempHysteresisDegCCard);
-		}
-
 		if (Thermal.hasPollMs()) {
 		    List<String> list = new ArrayList<>();
 		    for (int i = 0; i < 301; i++) list.add((i * 10) + getString(R.string.ms));
@@ -216,6 +220,19 @@ public class ThermalFragment extends RecyclerViewFragment implements SwitchCardV
 
 		    addView(mPollMsCard);
 		}
+	}
+
+	if (Thermal.hasCoreTempHysteresisDegC()) {
+	    List<String> list = new ArrayList<>();
+	    for (double i = 0; i < 21; i++)
+	        list.add(Utils.formatCelsius(i) + " " + Utils.celsiusToFahrenheit(i));
+
+	    mCoreTempHysteresisDegCCard = new SeekBarCardView.DSeekBarCard(list);
+	    mCoreTempHysteresisDegCCard.setTitle(getString(R.string.core_temp_hysteresis));
+	    mCoreTempHysteresisDegCCard.setProgress(Thermal.getCoreTempHysteresisDegC());
+	    mCoreTempHysteresisDegCCard.setOnDSeekBarCardListener(this);
+
+	    addView(mCoreTempHysteresisDegCCard);
 	}
 
         if (Thermal.hasFreqStep()) {
@@ -587,5 +604,130 @@ public class ThermalFragment extends RecyclerViewFragment implements SwitchCardV
             Thermal.setAllowedMidFreq(CPU.getFreqs().get(position), getActivity());
         else if (dPopupCard == mAllowedMaxFreqCard)
             Thermal.setAllowedMaxFreq(CPU.getFreqs().get(position), getActivity());
+    }
+
+    // Default TODO
+    public void checkdefault(Context context) {
+        mDefaultCard = new CardViewItem.DCardView();
+        mDefaultCard.setTitle(getString(R.string.defaults));
+        mDefaultCard.setDescription(getString(R.string.defaults_summary));
+        if (Utils.getBoolean("ThermalDefault", false, getActivity())) {
+            SharedPreferences thermaldefault = getContext().getSharedPreferences("thermal", 0);
+            for (Map.Entry entry: thermaldefault.getAll().entrySet())
+                defaultlist.put(entry.getKey().toString(), entry.getValue().toString());
+
+            if (defaultlist.get("ThermalengineDefault") != null) {
+                if (defaultlist.get("ThermalengineDefault").equals("true")) termal_engine_default =
+                    getString(R.string.termal_engine) + " = " + getString(R.string.on);
+                if (defaultlist.get("ThermalengineDefault").equals("false")) termal_engine_default =
+                    getString(R.string.termal_engine) + " = " + getString(R.string.off);
+            }
+            if (defaultlist.get("IntelliThermalDefault") != null) {
+                if (defaultlist.get("IntelliThermalDefault").equals("Y")) intellithermal_default =
+                    getString(R.string.intellithermal) + " = " + getString(R.string.on);
+                if (defaultlist.get("IntelliThermalDefault").equals("N")) intellithermal_default =
+                    getString(R.string.intellithermal) + " = " + getString(R.string.off);
+            }
+            if (defaultlist.get("LimitTempDegCDefault") != null) limittempdegc_default =
+                getString(R.string.freq_throttle_temp) + " = " +
+                Utils.formatCelsius(Integer.parseInt(defaultlist.get("LimitTempDegCDefault"))) +
+                Utils.celsiusToFahrenheit(Integer.parseInt(defaultlist.get("LimitTempDegCDefault"))) + "\n";
+            if (defaultlist.get("CoreLimitTempDegCDefault") != null) corelimittempdegc_default =
+                getString(R.string.core_throttle_temp) + " = " +
+                Utils.formatCelsius(Integer.parseInt(defaultlist.get("CoreLimitTempDegCDefault"))) +
+                Utils.celsiusToFahrenheit(Integer.parseInt(defaultlist.get("CoreLimitTempDegCDefault"))) + "\n";
+            if (defaultlist.get("PollMsDefault") != null) pollms_default =
+                getString(R.string.poll) + " = " + Integer.parseInt(defaultlist.get("PollMsDefault")) +
+                getString(R.string.ms) + "\n";
+
+            termal_default = termal_engine_default + intellithermal_default +
+                limittempdegc_default + corelimittempdegc_default + pollms_default;
+            listdefaults();
+        } 
+	else {
+            mDefaultCard.setOnDCardListener(new CardViewItem.DCardView.OnDCardListener() {
+                @Override
+                public void onClick(CardViewItem.DCardView dCardView) {
+                    if (Utils.getBoolean("ThermalDefaultempty", false, getActivity())) {
+                        new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle)
+                            .setMessage(getString(R.string.default_no_default_saved)).show();
+                    } else new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle)
+                        .setMessage(getString(R.string.default_no_default_found)).show();
+                }
+            });
+        addView(mDefaultCard);
+	}
+    }
+
+    // Default TODO
+    public void listdefaults() {
+        mDefaultCard.setOnDCardListener(new CardViewItem.DCardView.OnDCardListener() {
+            @Override
+            public void onClick(CardViewItem.DCardView dCardView) {
+                /*getdefaultstring(getActivity());*/
+                new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle)
+                    .setTitle(getString(R.string.default_setting)).setMessage(termal_default)
+                    .setPositiveButton(getString(R.string.apply), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int apply) {
+                            new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle)
+                                .setTitle(getString(R.string.default_apply_default)).setMessage(termal_default)
+                                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int no) {
+                                        Utils.toast("TODO\n\nNo\n\nTODO", getActivity());
+                                    }
+                                })
+                                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int yes) {
+                                        // Default TODO apply default things here do a code
+                                        Utils.toast(getString(R.string.default_setting_set), getActivity());
+                                        rundefault(getActivity());
+                                    }
+                                }).show();
+                        }
+                    }).show();
+            }
+        });
+        addView(mDefaultCard);
+    }
+
+    // Default TODO
+    public void rundefault(Context context) {
+        SharedPreferences thermaldefault = getContext().getSharedPreferences("thermal", 0);
+        for (Map.Entry entry: thermaldefault.getAll().entrySet())
+            defaultlist.put(entry.getKey().toString(), entry.getValue().toString());
+
+        if (defaultlist.get("ThermalengineDefault") != null) {
+            if (defaultlist.get("ThermalengineDefault").equals("true"))
+                Control.startService(Constants.THERMAL_ENGINE, getActivity());
+            if (defaultlist.get("ThermalengineDefault").equals("false"))
+                Control.stopService(Constants.THERMAL_ENGINE, getActivity());
+        }
+        if (defaultlist.get("IntelliThermalDefault") != null) {
+            if (defaultlist.get("IntelliThermalDefault").equals("Y"))
+                Control.runCommand("Y", Thermal.getThermalFile(Constants.PARAMETERS_INTELLI_ENABLED),
+                    Control.CommandType.GENERIC, getActivity());
+            if (defaultlist.get("IntelliThermalDefault").equals("N"))
+                Control.runCommand("N", Thermal.getThermalFile(Constants.PARAMETERS_INTELLI_ENABLED),
+                    Control.CommandType.GENERIC, getActivity());
+        }
+        if (defaultlist.get("LimitTempDegCDefault") != null) Control.runCommand(String.valueOf(Integer.parseInt(defaultlist.get("LimitTempDegCDefault"))),
+            Thermal.getThermalFile(Constants.PARAMETERS_LIMIT_TEMP_DEGC), Control.CommandType.GENERIC, getActivity());
+        if (defaultlist.get("CoreLimitTempDegCDefault") != null) Control.runCommand(String.valueOf(Integer.parseInt(defaultlist.get("CoreLimitTempDegCDefault"))),
+            Thermal.getThermalFile(Constants.PARAMETERS_CORE_LIMIT_TEMP_DEGC),
+            Control.CommandType.GENERIC, getActivity());
+        if (defaultlist.get("PollMsDefault") != null) Control.runCommand(String.valueOf(Integer.parseInt(defaultlist.get("PollMsDefault"))),
+            Thermal.getThermalFile(Constants.PARAMETERS_POLL_MS),
+            Control.CommandType.GENERIC, getActivity());
+
+        view.invalidate();
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        getActivity().getSupportFragmentManager().beginTransaction().detach(this).attach(this).commit();
     }
 }
