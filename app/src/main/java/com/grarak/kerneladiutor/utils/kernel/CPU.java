@@ -668,6 +668,15 @@ public class CPU implements Constants {
 
     public static void activateStateHelper(boolean active, Context context) {
         Control.runCommand(active ? "1" : "0", STATE_HELPER_ENABLE, Control.CommandType.GENERIC, context);
+	//Stop 100ms for the STATE_HELPER run then put all core offline, core 1/2/3 can stall online after enable disable this
+	//not a problem as it will offline all after the screen goes of
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+	for (int i = 1; i < getCoreCount(); i++)
+	Control.runCommand(String.valueOf("0"), String.format(CPU_CORE_ONLINE, i), Control.CommandType.GENERIC, context);
     }
 
     public static void setStateHelperMaxCpusOnline(int value, Context context) {
