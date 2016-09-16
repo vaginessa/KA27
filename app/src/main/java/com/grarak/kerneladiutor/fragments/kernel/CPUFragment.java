@@ -129,6 +129,7 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         private SwitchCardView.DSwitchCard mCpuBoostEnableCard;
         private SwitchCardView.DSwitchCard mCpuBoostDebugMaskCard;
         private SeekBarCardView.DSeekBarCard mCpuBoostMsCard;
+        private SeekBarCardView.DSeekBarCard mStateDeferCard;
         private PopupCardView.DPopupCard mCpuBoostSyncThresholdCard;
         private SeekBarCardView.DSeekBarCard mCpuBoostInputMsCard;
         private PopupCardView.DPopupCard[] mCpuBoostInputFreqCard;
@@ -136,6 +137,8 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         private SwitchCardView.DSwitchCard mCpuBoostHotplugCard;
 
         private SwitchCardView.DSwitchCard mCpuTouchBoostCard;
+
+	private SwitchCardView.DSwitchCard mStateNotifierStateCard;
 
         @Override
         public String getClassName() {
@@ -178,6 +181,7 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
             if (CPU.hasMcPowerSaving()) mcPowerSavingInit();
             if (CPU.hasPowerSavingWq()) powerSavingWqInit();
             if (CPU.hasCFSScheduler()) cfsSchedulerInit();
+            if (CPU.hasStateNotifier()) statenotifierInit();
             if (CPU.hasCpuQuiet()) cpuQuietInit();
             if (CPU.hasCpuBoost()) cpuBoostInit();
             if (CPU.hasCpuTouchBoost()) cpuTouchBoostInit();
@@ -383,6 +387,30 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
 
             addView(mCFSSchedulerCard);
         }
+
+	private void statenotifierInit() {
+	    mStateNotifierStateCard = new SwitchCardView.DSwitchCard();
+	    mStateNotifierStateCard.setTitle(getString(R.string.state_notifier_mode));
+	    mStateNotifierStateCard.setDescription(getString(CPU.isStateNotifierStateActive() ? R.string.state_notifier_mode_summary_enabled : R.string.state_notifier_mode_summary_disabled));
+	    mStateNotifierStateCard.setChecked(CPU.isStateNotifierStateActive());
+	    mStateNotifierStateCard.setOnDSwitchCardListener(this);
+
+	    addView(mStateNotifierStateCard);
+
+		if (CPU.hasStateDefer()) {
+		        List<String> list = new ArrayList<>();
+		        for (int i = 0; i < 51; i += 1)
+		            list.add(i + getString(R.string.sec));
+
+		        mStateDeferCard = new SeekBarCardView.DSeekBarCard(list);
+		        mStateDeferCard.setTitle(getString(R.string.state_defer));
+		        mStateDeferCard.setDescription(getString(R.string.state_defer_summary));
+		        mStateDeferCard.setProgress(CPU.getStateDefer());
+		        mStateDeferCard.setOnDSeekBarCardListener(this);
+
+		        addView(mStateDeferCard);
+		}
+	}
 
         private void cpuQuietInit() {
             if (CPU.hasCpuQuietEnable()) {
@@ -620,6 +648,8 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                 CPU.setCpuBoostMs(position * 10, getActivity());
             else if (dSeekBarCard == mCpuBoostInputMsCard)
                 CPU.setCpuBoostInputMs(position * 10, getActivity());
+            else if (dSeekBarCard == mStateDeferCard)
+                CPU.setStateDefer(position, getActivity());
         }
 
         @Override
@@ -632,6 +662,10 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                 CPU.activateCpuBoostDebugMask(checked, getActivity());
             else if (dSwitchCard == mPowerSavingWqCard)
                 CPU.activatePowerSavingWq(checked, getActivity());
+            else if (dSwitchCard == mStateNotifierStateCard) {
+                CPU.activateStateNotifier(checked, getActivity());
+                mStateNotifierStateCard.setDescription(getString(checked ? R.string.state_notifier_mode_summary_enabled : R.string.state_notifier_mode_summary_disabled));
+            }
             else if (dSwitchCard == mCpuBoostWakeupCard)
                 CPU.activateCpuBoostWakeup(checked, getActivity());
             else if (dSwitchCard == mCpuBoostHotplugCard)
