@@ -1721,7 +1721,6 @@ public class CPUHotplug implements Constants {
         if (CPUHotplug.isMSMSleeperActive() && hasMSMSleeperEnable() && !activehotplug.equals("MSM_Sleeper")) Control.runCommand("0", MSM_SLEEPER_ENABLE, Control.CommandType.GENERIC, context);
         if (CPUHotplug.isMBHotplugActive() && hasMBHotplugEnable() && !activehotplug.equals("MBHotplug")) Control.runCommand("0", Utils.getsysfspath(MB_HOTPLUG_ARRAY) + "/" + MB_ENABLED, Control.CommandType.GENERIC, context);
         if (CPUHotplug.isMsmHotplugActive() && hasMsmHotplugEnable() && !activehotplug.equals("MSMHotPlug")) Control.runCommand("0", MSM_HOTPLUG_ENABLE_FILE, Control.CommandType.GENERIC, context);
-        if (CPUHotplug.isStateHelperActive() && hasStateHelperEnable() && !activehotplug.equals("State_Helper")) Control.runCommand("0", STATE_HELPER_ENABLE, Control.CommandType.GENERIC, context);
         if (CPUHotplug.isLazyPlugActive() && hasLazyPlugEnable() && !activehotplug.equals("LazyPlug")) Control.runCommand("0", HOTPLUG_LAZYPLUG_TOUCH_BOOST_ACTIVE, Control.CommandType.GENERIC, context);
         if (CPUHotplug.isDynPlugActive() && hasDynPlugEnable() && !activehotplug.equals("DynPlug")) Control.runCommand("N", HOTPLUG_DYN_PLUG_ENABLE, Control.CommandType.GENERIC, context);
         if (CPUHotplug.isAutoHotplugActive() && hasAutoHotplugEnable() && !activehotplug.equals("AutoHotplug")) Control.runCommand("N", HOTPLUG_AUTO_HOTPLUG_ENABLE, Control.CommandType.GENERIC, context);
@@ -1803,95 +1802,6 @@ public class CPUHotplug implements Constants {
 
     public static boolean hasMSMSleeperDownCountMax() {
         return Utils.existFile(MSM_SLEEPER_DOWN_COUNT_MAX);
-    }
-
-    public static boolean hasStateHelper () {
-        return Utils.existFile(STATE_HELPER);
-    }
-
-    public static boolean hasStateHelperEnable () {
-        return Utils.existFile(STATE_HELPER_ENABLE);
-    }
-
-    public static boolean isStateHelperActive () {
-        return Utils.readFile(STATE_HELPER_ENABLE).equals("1");
-    }
-
-    public static void activateStateHelper (boolean active, Context context) {
-        Control.runCommand(active ? "1" : "0", STATE_HELPER_ENABLE, Control.CommandType.GENERIC, context);
-        if (active) togglehotplugs("State_Helper", context);
-    }
-
-    public static void setStateHelperMaxCpusOnline(int value, Context context) {
-        Control.runCommand(String.valueOf(value), STATE_HELPER_MAX_CPUS_ONLINE, Control.CommandType.GENERIC, context);
-    }
-
-    public static int getStateHelperMaxCpusOnline() {
-        return Utils.stringToInt(Utils.readFile(STATE_HELPER_MAX_CPUS_ONLINE));
-    }
-
-    public static boolean hasStateHelperMaxCpusOnline() {
-        return Utils.existFile(STATE_HELPER_MAX_CPUS_ONLINE);
-    }
-
-    public static void setStateHelperMaxCpusSuspend(int value, Context context) {
-        Control.runCommand(String.valueOf(value), STATE_HELPER_MAX_CPUS_SUSPEND, Control.CommandType.GENERIC, context);
-    }
-
-    public static int getStateHelperMaxCpusSuspend() {
-        return Utils.stringToInt(Utils.readFile(STATE_HELPER_MAX_CPUS_SUSPEND));
-    }
-
-    public static boolean hasStateHelperMaxCpusSuspend() {
-        return Utils.existFile(STATE_HELPER_MAX_CPUS_SUSPEND);
-    }
-
-    public static boolean hasStateHelperBattLevelEco () {
-        return Utils.existFile(STATE_HELPER_BATT_LEVEL_ECO);
-    }
-
-    public static int getStateHelperBattLevelEco() {
-        return Utils.stringToInt(Utils.readFile(STATE_HELPER_BATT_LEVEL_ECO));
-    }
-
-    public static void setStateHelperBattLevelEco(int value, Context context) {
-        Control.runCommand(String.valueOf(value), STATE_HELPER_BATT_LEVEL_ECO, Control.CommandType.GENERIC, context);
-    }
-
-    public static boolean hasStateHelperBattLevelCri () {
-        return Utils.existFile(STATE_HELPER_BATT_LEVEL_CRI);
-    }
-
-    public static int getStateHelperBattLevelCri() {
-        return Utils.stringToInt(Utils.readFile(STATE_HELPER_BATT_LEVEL_CRI));
-    }
-
-    public static void setStateHelperBattLevelCri(int value, Context context) {
-        Control.runCommand(String.valueOf(value), STATE_HELPER_BATT_LEVEL_CRI, Control.CommandType.GENERIC, context);
-    }
-
-    public static void setStateHelperMaxCpusEco(int value, Context context) {
-        Control.runCommand(String.valueOf(value), STATE_HELPER_MAX_CPU_ECO, Control.CommandType.GENERIC, context);
-    }
-
-    public static int getStateHelperMaxCpusEco() {
-        return Utils.stringToInt(Utils.readFile(STATE_HELPER_MAX_CPU_ECO));
-    }
-
-    public static boolean hasStateHelperMaxCpusEco() {
-        return Utils.existFile(STATE_HELPER_MAX_CPU_ECO);
-    }
-
-    public static void setStateHelperMaxCpusCri(int value, Context context) {
-        Control.runCommand(String.valueOf(value), STATE_HELPER_MAX_CPU_CRI, Control.CommandType.GENERIC, context);
-    }
-
-    public static int getStateHelperMaxCpusCri() {
-        return Utils.stringToInt(Utils.readFile(STATE_HELPER_MAX_CPU_CRI));
-    }
-
-    public static boolean hasStateHelperMaxCpusCri() {
-        return Utils.existFile(STATE_HELPER_MAX_CPU_CRI);
     }
 
     public static void activatebch(boolean active, Context context) {

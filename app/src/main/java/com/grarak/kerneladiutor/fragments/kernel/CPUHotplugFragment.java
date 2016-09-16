@@ -177,10 +177,6 @@ public class CPUHotplugFragment extends RecyclerViewFragment implements
     private SeekBarCardView.DSeekBarCard mMSMSleeperUpThresholdCard, mMSMSleeperMaxOnlineCard, mMSMSleeperSuspendMaxOnlineCard,
             mMSMSleeperUpCountMaxCard, mMSMSleeperDownCountMaxCard;
 
-    private SwitchCardView.DSwitchCard mStateHelperEnableCard;
-    private SeekBarCardView.DSeekBarCard mStateHelper_batt_level_eco_Card, mStateHelper_max_cpus_eco_Card,mStateHelper_batt_level_cri_Card,
-            mStateHelper_max_cpus_cri_Card, mStateHelper_max_cpus_online_Card, mStateHelper_max_cpus_susp_Card;
-
     private SeekBarCardView.DSeekBarCard msmperformanceCard;
 
     private SwitchCardView.DSwitchCard mHimaEnableCard;
@@ -206,7 +202,6 @@ public class CPUHotplugFragment extends RecyclerViewFragment implements
         if (CPUHotplug.hasMsmHotplugEnable()) msmHotplugInit();
         if (CPUHotplug.hasmsmperformance()) msmperformanceInit();
         if (CPUHotplug.hasMSMSleeperEnable()) msmSleeperInit();
-        if (CPUHotplug.hasStateHelperEnable()) msmState_Helper_Init();
         if (CPUHotplug.hasThunderPlugEnable()) thunderPlugInit();
         if (CPUHotplug.hasZenDecisionEnable()) zenDecisionInit();
         tunablesInit();
@@ -401,18 +396,6 @@ public class CPUHotplugFragment extends RecyclerViewFragment implements
         msmperformanceCard.setOnDSeekBarCardListener(this);
 
         addView(msmperformanceCard);
-    }
-
-    private void msmState_Helper_Init() {
-        if (CPUHotplug.hasStateHelperEnable()) {
-            mStateHelperEnableCard = new SwitchCardView.DSwitchCard();
-            mStateHelperEnableCard.setTitle(getString(R.string.state_helper));
-            mStateHelperEnableCard.setDescription(getString(R.string.state_helper_summary));
-            mStateHelperEnableCard.setChecked(CPUHotplug.isStateHelperActive());
-            mStateHelperEnableCard.setOnDSwitchCardListener(this);
-
-            addView(mStateHelperEnableCard);
-        }
     }
 
     private void himaInit() {
@@ -2030,94 +2013,6 @@ public class CPUHotplugFragment extends RecyclerViewFragment implements
 
         }
 
-        // StateHelper Tunables
-        if (CPUHotplug.isStateHelperActive() || (!CPUHotplug.hasStateHelperEnable() && CPUHotplug.hasStateHelper())) {
-            DDivider mStateHelperDividerCard = new DDivider();
-            mStateHelperDividerCard.setText(getString(R.string.state_helper));
-            if (!CPUHotplug.hasStateHelperEnable() && CPUHotplug.hasStateHelper()) {
-                mStateHelperDividerCard.setDescription(getString(R.string.no_enable_toggle));
-            }
-            views.add(mStateHelperDividerCard);
-
-            if (CPUHotplug.hasStateHelperMaxCpusOnline()) {
-                List<String> list = new ArrayList<>();
-                for (int i = 0; i < CPU.getCoreCount(); i++)
-                    list.add(String.valueOf(i + 1));
-
-                mStateHelper_max_cpus_online_Card = new SeekBarCardView.DSeekBarCard(list);
-                mStateHelper_max_cpus_online_Card.setTitle(getString(R.string.state_helper_max_cpus_online));
-                mStateHelper_max_cpus_online_Card.setProgress(CPUHotplug.getStateHelperMaxCpusOnline() - 1);
-                mStateHelper_max_cpus_online_Card.setOnDSeekBarCardListener(this);
-
-                views.add(mStateHelper_max_cpus_online_Card);
-            }
-
-            if (CPUHotplug.hasStateHelperMaxCpusSuspend()) {
-                List<String> list = new ArrayList<>();
-                for (int i = 0; i < CPU.getCoreCount(); i++)
-                    list.add(String.valueOf(i + 1));
-
-                mStateHelper_max_cpus_susp_Card = new SeekBarCardView.DSeekBarCard(list);
-                mStateHelper_max_cpus_susp_Card.setTitle(getString(R.string.state_helper_max_cpus_suspend));
-                mStateHelper_max_cpus_susp_Card.setProgress(CPUHotplug.getStateHelperMaxCpusSuspend() - 1);
-                mStateHelper_max_cpus_susp_Card.setOnDSeekBarCardListener(this);
-
-                views.add(mStateHelper_max_cpus_susp_Card);
-            }
-
-            if (CPUHotplug.hasStateHelperBattLevelEco()) {
-                List<String> list = new ArrayList<>();
-                for (int i = 1; i < 101; i++) list.add(i + getString(R.string.percent));
-
-                mStateHelper_batt_level_eco_Card = new SeekBarCardView.DSeekBarCard(list);
-                mStateHelper_batt_level_eco_Card.setTitle(getString(R.string.state_helper_batt_level_eco));
-                mStateHelper_batt_level_eco_Card.setDescription(getString(R.string.state_helper_batt_level_eco_summary));
-                mStateHelper_batt_level_eco_Card.setProgress(CPUHotplug.getStateHelperBattLevelEco() - 1);
-                mStateHelper_batt_level_eco_Card.setOnDSeekBarCardListener(this);
-
-                views.add(mStateHelper_batt_level_eco_Card);
-            }
-
-            if (CPUHotplug.hasStateHelperMaxCpusEco()) {
-                List<String> list = new ArrayList<>();
-                for (int i = 0; i < CPU.getCoreCount(); i++)
-                    list.add(String.valueOf(i + 1));
-
-                mStateHelper_max_cpus_eco_Card = new SeekBarCardView.DSeekBarCard(list);
-                mStateHelper_max_cpus_eco_Card.setTitle(getString(R.string.state_helper_max_cpus_eco));
-                mStateHelper_max_cpus_eco_Card.setProgress(CPUHotplug.getStateHelperMaxCpusEco() - 1);
-                mStateHelper_max_cpus_eco_Card.setOnDSeekBarCardListener(this);
-
-                views.add(mStateHelper_max_cpus_eco_Card);
-            }
-
-            if (CPUHotplug.hasStateHelperBattLevelCri()) {
-                List<String> list = new ArrayList<>();
-                for (int i = 1; i < 101; i++) list.add(i + getString(R.string.percent));
-
-                mStateHelper_batt_level_cri_Card = new SeekBarCardView.DSeekBarCard(list);
-                mStateHelper_batt_level_cri_Card.setTitle(getString(R.string.state_helper_batt_level_cri));
-                mStateHelper_batt_level_cri_Card.setDescription(getString(R.string.state_helper_batt_level_eco_summary));
-                mStateHelper_batt_level_cri_Card.setProgress(CPUHotplug.getStateHelperBattLevelCri() - 1);
-                mStateHelper_batt_level_cri_Card.setOnDSeekBarCardListener(this);
-
-                views.add(mStateHelper_batt_level_cri_Card);
-            }
-
-            if (CPUHotplug.hasStateHelperMaxCpusCri()) {
-                List<String> list = new ArrayList<>();
-                for (int i = 0; i < CPU.getCoreCount(); i++)
-                    list.add(String.valueOf(i + 1));
-
-                mStateHelper_max_cpus_cri_Card = new SeekBarCardView.DSeekBarCard(list);
-                mStateHelper_max_cpus_cri_Card.setTitle(getString(R.string.state_helper_max_cpus_cri));
-                mStateHelper_max_cpus_cri_Card.setProgress(CPUHotplug.getStateHelperMaxCpusCri() - 1);
-                mStateHelper_max_cpus_cri_Card.setOnDSeekBarCardListener(this);
-
-                views.add(mStateHelper_max_cpus_cri_Card);
-            }
-        }
-
         // Hima Tunables
         if (CPUHotplug.isHimaActive() || (!CPUHotplug.hasHimaEnable() && CPUHotplug.hasHima())) {
             DDivider mHimaDividerCard = new DDivider();
@@ -2235,8 +2130,6 @@ public class CPUHotplugFragment extends RecyclerViewFragment implements
             CPUHotplug.activateAutoSmpScroffSingleCoreActive(checked, getActivity());
         else if (dSwitchCard == mMSMSleeperEnableCard)
             CPUHotplug.activateMSMSleeper(checked, getActivity());
-        else if (dSwitchCard == mStateHelperEnableCard)
-            CPUHotplug.activateStateHelper(checked, getActivity());
         else if (dSwitchCard == mLazyPlugEnableCard)
             CPUHotplug.activateLazyPlug(checked, getActivity());
         else if (dSwitchCard == mLazyPlugTouchBoostActiveCard)
@@ -2251,7 +2144,6 @@ public class CPUHotplugFragment extends RecyclerViewFragment implements
             CPUHotplug.activateHima(checked, getActivity());
         view.invalidate();
         getActivity().getSupportFragmentManager().beginTransaction().detach(this).attach(this).commit();
-
     }
 
     @Override
@@ -2469,18 +2361,6 @@ public class CPUHotplugFragment extends RecyclerViewFragment implements
             CPUHotplug.setMSMSleeperUpCountMax(position, getActivity());
         else if (dSeekBarCard == mMSMSleeperDownCountMaxCard)
             CPUHotplug.setMSMSleeperDownCountMax(position, getActivity());
-        else if (dSeekBarCard == mStateHelper_batt_level_eco_Card)
-            CPUHotplug.setStateHelperBattLevelEco(position + 1, getActivity());
-        else if (dSeekBarCard == mStateHelper_batt_level_cri_Card)
-            CPUHotplug.setStateHelperBattLevelCri(position + 1, getActivity());
-        else if (dSeekBarCard == mStateHelper_max_cpus_eco_Card)
-            CPUHotplug.setStateHelperMaxCpusEco(position + 1, getActivity());
-        else if (dSeekBarCard == mStateHelper_max_cpus_cri_Card)
-            CPUHotplug.setStateHelperMaxCpusCri(position + 1, getActivity());
-        else if (dSeekBarCard == mStateHelper_max_cpus_online_Card)
-            CPUHotplug.setStateHelperMaxCpusOnline(position + 1, getActivity());
-        else if (dSeekBarCard == mStateHelper_max_cpus_susp_Card)
-            CPUHotplug.setStateHelperMaxCpusSuspend(position + 1, getActivity());
         else if (dSeekBarCard == msmperformanceCard)
             CPUHotplug.setmsmperformance(position - 1, getActivity());
         else if (dSeekBarCard == mHimaMinCpusCard)

@@ -140,6 +140,10 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
 
 	private SwitchCardView.DSwitchCard mStateNotifierStateCard;
 
+    private SwitchCardView.DSwitchCard mStateHelperEnableCard;
+    private SeekBarCardView.DSeekBarCard mStateHelper_batt_level_eco_Card, mStateHelper_max_cpus_eco_Card,mStateHelper_batt_level_cri_Card,
+            mStateHelper_max_cpus_cri_Card, mStateHelper_max_cpus_online_Card, mStateHelper_max_cpus_susp_Card;
+
         @Override
         public String getClassName() {
             return CPUFragment.class.getSimpleName();
@@ -178,13 +182,16 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                 addView(othersDivider);
             }
             int count = getCount();
-            if (CPU.hasMcPowerSaving()) mcPowerSavingInit();
-            if (CPU.hasPowerSavingWq()) powerSavingWqInit();
-            if (CPU.hasCFSScheduler()) cfsSchedulerInit();
-            if (CPU.hasStateNotifier()) statenotifierInit();
-            if (CPU.hasCpuQuiet()) cpuQuietInit();
-            if (CPU.hasCpuBoost()) cpuBoostInit();
-            if (CPU.hasCpuTouchBoost()) cpuTouchBoostInit();
+
+	    if (CPU.hasStateHelper()) msmState_Helper_Init();
+	    if (CPU.hasStateNotifier()) statenotifierInit();
+	    ExtraFlagDividerInit();
+	    if (CPU.hasMcPowerSaving()) mcPowerSavingInit();
+	    if (CPU.hasPowerSavingWq()) powerSavingWqInit();
+	    if (CPU.hasCFSScheduler()) cfsSchedulerInit();
+	    if (CPU.hasCpuQuiet()) cpuQuietInit();
+	    if (CPU.hasCpuBoost()) cpuBoostInit();
+	    if (CPU.hasCpuTouchBoost()) cpuTouchBoostInit();
             if (othersDivider != null && (count == getCount() || getView(count) instanceof DDivider))
                 removeView(othersDivider);
         }
@@ -357,6 +364,115 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
             addView(mGovernorTunableLITTLECard);
         }
 
+	private void msmState_Helper_Init() {
+	    if (CPU.hasStateHelperEnabler()) {
+	        DDivider mStateHelperDividerCard = new DDivider();
+	        mStateHelperDividerCard.setText(getString(R.string.state_helper));
+	        mStateHelperDividerCard.setDescription(getString(R.string.state_helper_description));
+	        addView(mStateHelperDividerCard);
+
+	        mStateHelperEnableCard = new SwitchCardView.DSwitchCard();
+	        mStateHelperEnableCard.setTitle(getString(R.string.state_helper));
+	        mStateHelperEnableCard.setDescription(getString(R.string.state_helper_summary));
+	        mStateHelperEnableCard.setChecked(CPU.isStateHelperActive());
+	        mStateHelperEnableCard.setOnDSwitchCardListener(this);
+
+	        addView(mStateHelperEnableCard);
+	    }
+
+	    // StateHelper Tunables
+	    if (CPU.isStateHelperActive()) {
+	        List < DAdapter.DView > views = new ArrayList < > ();
+	        views.clear();
+	        if (CPU.hasStateHelperMaxCpusOnline()) {
+	            List < String > list = new ArrayList < > ();
+	            for (int i = 0; i < CPU.getCoreCount(); i++)
+	                list.add(String.valueOf(i + 1));
+
+	            mStateHelper_max_cpus_online_Card = new SeekBarCardView.DSeekBarCard(list);
+	            mStateHelper_max_cpus_online_Card.setTitle(getString(R.string.state_helper_max_cpus_online));
+	            mStateHelper_max_cpus_online_Card.setProgress(CPU.getStateHelperMaxCpusOnline() - 1);
+	            mStateHelper_max_cpus_online_Card.setOnDSeekBarCardListener(this);
+
+	            views.add(mStateHelper_max_cpus_online_Card);
+	        }
+
+	        if (CPU.hasStateHelperMaxCpusSuspend()) {
+	            List < String > list = new ArrayList < > ();
+	            for (int i = 0; i < CPU.getCoreCount(); i++)
+	                list.add(String.valueOf(i + 1));
+
+	            mStateHelper_max_cpus_susp_Card = new SeekBarCardView.DSeekBarCard(list);
+	            mStateHelper_max_cpus_susp_Card.setTitle(getString(R.string.state_helper_max_cpus_suspend));
+	            mStateHelper_max_cpus_susp_Card.setProgress(CPU.getStateHelperMaxCpusSuspend() - 1);
+	            mStateHelper_max_cpus_susp_Card.setOnDSeekBarCardListener(this);
+
+	            views.add(mStateHelper_max_cpus_susp_Card);
+	        }
+
+	        if (CPU.hasStateHelperBattLevelEco()) {
+	            List < String > list = new ArrayList < > ();
+	            for (int i = 1; i < 101; i++) list.add(i + getString(R.string.percent));
+
+	            mStateHelper_batt_level_eco_Card = new SeekBarCardView.DSeekBarCard(list);
+	            mStateHelper_batt_level_eco_Card.setTitle(getString(R.string.state_helper_batt_level_eco));
+	            mStateHelper_batt_level_eco_Card.setDescription(getString(R.string.state_helper_batt_level_eco_summary));
+	            mStateHelper_batt_level_eco_Card.setProgress(CPU.getStateHelperBattLevelEco() - 1);
+	            mStateHelper_batt_level_eco_Card.setOnDSeekBarCardListener(this);
+
+	            views.add(mStateHelper_batt_level_eco_Card);
+	        }
+
+	        if (CPU.hasStateHelperMaxCpusEco()) {
+	            List < String > list = new ArrayList < > ();
+	            for (int i = 0; i < CPU.getCoreCount(); i++)
+	                list.add(String.valueOf(i + 1));
+
+	            mStateHelper_max_cpus_eco_Card = new SeekBarCardView.DSeekBarCard(list);
+	            mStateHelper_max_cpus_eco_Card.setTitle(getString(R.string.state_helper_max_cpus_eco));
+	            mStateHelper_max_cpus_eco_Card.setProgress(CPU.getStateHelperMaxCpusEco() - 1);
+	            mStateHelper_max_cpus_eco_Card.setOnDSeekBarCardListener(this);
+
+	            views.add(mStateHelper_max_cpus_eco_Card);
+	        }
+
+	        if (CPU.hasStateHelperBattLevelCri()) {
+	            List < String > list = new ArrayList < > ();
+	            for (int i = 1; i < 101; i++) list.add(i + getString(R.string.percent));
+
+	            mStateHelper_batt_level_cri_Card = new SeekBarCardView.DSeekBarCard(list);
+	            mStateHelper_batt_level_cri_Card.setTitle(getString(R.string.state_helper_batt_level_cri));
+	            mStateHelper_batt_level_cri_Card.setDescription(getString(R.string.state_helper_batt_level_eco_summary));
+	            mStateHelper_batt_level_cri_Card.setProgress(CPU.getStateHelperBattLevelCri() - 1);
+	            mStateHelper_batt_level_cri_Card.setOnDSeekBarCardListener(this);
+
+	            views.add(mStateHelper_batt_level_cri_Card);
+	        }
+
+	        if (CPU.hasStateHelperMaxCpusCri()) {
+	            List < String > list = new ArrayList < > ();
+	            for (int i = 0; i < CPU.getCoreCount(); i++)
+	                list.add(String.valueOf(i + 1));
+
+	            mStateHelper_max_cpus_cri_Card = new SeekBarCardView.DSeekBarCard(list);
+	            mStateHelper_max_cpus_cri_Card.setTitle(getString(R.string.state_helper_max_cpus_cri));
+	            mStateHelper_max_cpus_cri_Card.setProgress(CPU.getStateHelperMaxCpusCri() - 1);
+	            mStateHelper_max_cpus_cri_Card.setOnDSeekBarCardListener(this);
+
+	            views.add(mStateHelper_max_cpus_cri_Card);
+	        }
+	        if (views.size() > 0) {
+	            addAllViews(views);
+	        }
+	    }
+	}
+
+        private void ExtraFlagDividerInit() {
+	    DDivider mExtraFlagDividerDividerCard = new DDivider();
+	    mExtraFlagDividerDividerCard.setText(getString(R.string.cpu_extra));
+	    addView(mExtraFlagDividerDividerCard);
+        }
+
         private void mcPowerSavingInit() {
             mMcPowerSavingCard = new PopupCardView.DPopupCard(new ArrayList<>(Arrays.asList(
                     CPU.getMcPowerSavingItems(getActivity()))));
@@ -389,6 +505,12 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         }
 
 	private void statenotifierInit() {
+
+	    DDivider mNotifierStateDividerCard = new DDivider();
+	    mNotifierStateDividerCard.setText(getString(R.string.state_notifier));
+	    mNotifierStateDividerCard.setDescription(getString(R.string.state_notifier_summary));
+	    addView(mNotifierStateDividerCard);
+
 	    mStateNotifierStateCard = new SwitchCardView.DSwitchCard();
 	    mStateNotifierStateCard.setTitle(getString(R.string.state_notifier_mode));
 	    mStateNotifierStateCard.setDescription(getString(CPU.isStateNotifierStateActive() ? R.string.state_notifier_mode_summary_enabled : R.string.state_notifier_mode_summary_disabled));
@@ -397,19 +519,21 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
 
 	    addView(mStateNotifierStateCard);
 
-		if (CPU.hasStateDefer()) {
-		        List<String> list = new ArrayList<>();
-		        for (int i = 0; i < 51; i += 1)
-		            list.add(i + getString(R.string.sec));
+	    if (CPU.isStateNotifierStateActive()) {
+	        if (CPU.hasStateDefer()) {
+	            List < String > list = new ArrayList < > ();
+	            for (int i = 0; i < 51; i += 1)
+	                list.add(i + getString(R.string.sec));
 
-		        mStateDeferCard = new SeekBarCardView.DSeekBarCard(list);
-		        mStateDeferCard.setTitle(getString(R.string.state_defer));
-		        mStateDeferCard.setDescription(getString(R.string.state_defer_summary));
-		        mStateDeferCard.setProgress(CPU.getStateDefer());
-		        mStateDeferCard.setOnDSeekBarCardListener(this);
+	            mStateDeferCard = new SeekBarCardView.DSeekBarCard(list);
+	            mStateDeferCard.setTitle(getString(R.string.state_defer));
+	            mStateDeferCard.setDescription(getString(R.string.state_defer_summary));
+	            mStateDeferCard.setProgress(CPU.getStateDefer());
+	            mStateDeferCard.setOnDSeekBarCardListener(this);
 
-		        addView(mStateDeferCard);
-		}
+	            addView(mStateDeferCard);
+	        }
+	    }
 	}
 
         private void cpuQuietInit() {
@@ -650,6 +774,18 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                 CPU.setCpuBoostInputMs(position * 10, getActivity());
             else if (dSeekBarCard == mStateDeferCard)
                 CPU.setStateDefer(position, getActivity());
+            else if (dSeekBarCard == mStateHelper_batt_level_eco_Card)
+                CPU.setStateHelperBattLevelEco(position + 1, getActivity());
+            else if (dSeekBarCard == mStateHelper_batt_level_cri_Card)
+                CPU.setStateHelperBattLevelCri(position + 1, getActivity());
+            else if (dSeekBarCard == mStateHelper_max_cpus_eco_Card)
+                CPU.setStateHelperMaxCpusEco(position + 1, getActivity());
+            else if (dSeekBarCard == mStateHelper_max_cpus_cri_Card)
+                CPU.setStateHelperMaxCpusCri(position + 1, getActivity());
+            else if (dSeekBarCard == mStateHelper_max_cpus_online_Card)
+                CPU.setStateHelperMaxCpusOnline(position + 1, getActivity());
+            else if (dSeekBarCard == mStateHelper_max_cpus_susp_Card)
+                CPU.setStateHelperMaxCpusSuspend(position + 1, getActivity());
         }
 
         @Override
@@ -662,11 +798,16 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                 CPU.activateCpuBoostDebugMask(checked, getActivity());
             else if (dSwitchCard == mPowerSavingWqCard)
                 CPU.activatePowerSavingWq(checked, getActivity());
-            else if (dSwitchCard == mStateNotifierStateCard) {
+            else if (dSwitchCard == mStateHelperEnableCard) {
+                CPU.activateStateHelper(checked, getActivity());
+                view.invalidate();
+                getActivity().getSupportFragmentManager().beginTransaction().detach(this).attach(this).commit();
+            } else if (dSwitchCard == mStateNotifierStateCard) {
                 CPU.activateStateNotifier(checked, getActivity());
                 mStateNotifierStateCard.setDescription(getString(checked ? R.string.state_notifier_mode_summary_enabled : R.string.state_notifier_mode_summary_disabled));
-            }
-            else if (dSwitchCard == mCpuBoostWakeupCard)
+                view.invalidate();
+                getActivity().getSupportFragmentManager().beginTransaction().detach(this).attach(this).commit();
+            } else if (dSwitchCard == mCpuBoostWakeupCard)
                 CPU.activateCpuBoostWakeup(checked, getActivity());
             else if (dSwitchCard == mCpuBoostHotplugCard)
                 CPU.activateCpuBoostHotplug(checked, getActivity());

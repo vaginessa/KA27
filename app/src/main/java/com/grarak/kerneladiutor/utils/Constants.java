@@ -81,6 +81,16 @@ public interface Constants {
     String CPU_BOOST_WAKEUP = CPU_BOOST + "/wakeup_boost";
     String CPU_BOOST_HOTPLUG = CPU_BOOST + "/hotplug_boost";
 
+    // State Helper
+    String STATE_HELPER = "/sys/kernel/state_helper";
+    String STATE_HELPER_ENABLE = STATE_HELPER + "/enabled";
+    String STATE_HELPER_MAX_CPUS_ONLINE = STATE_HELPER + "/max_cpus_online";
+    String STATE_HELPER_MAX_CPUS_SUSPEND = STATE_HELPER + "/max_cpus_susp";
+    String STATE_HELPER_BATT_LEVEL_ECO = STATE_HELPER + "/batt_level_eco";
+    String STATE_HELPER_BATT_LEVEL_CRI = STATE_HELPER + "/batt_level_cri";
+    String STATE_HELPER_MAX_CPU_ECO = STATE_HELPER + "/max_cpus_eco";
+    String STATE_HELPER_MAX_CPU_CRI = STATE_HELPER + "/max_cpus_cri";
+
     // State Notifier
     String STATE_NOTIFIER = "/sys/module/state_notifier/parameters";
     String STATE_NOTIFIER_ENABLED = STATE_NOTIFIER + "/enabled";
@@ -91,7 +101,8 @@ public interface Constants {
     String[] CPU_ARRAY = {CPU_CUR_FREQ, CPU_TEMP_ZONE0, CPU_TEMP_ZONE1, CPU_CORE_ONLINE, CPU_MAX_FREQ, CPU_MAX_FREQ_KT, CPU_ENABLE_OC,
             CPU_MIN_FREQ, CPU_MAX_SCREEN_OFF_FREQ, CPU_MSM_CPUFREQ_LIMIT, CPU_AVAILABLE_FREQS, CPU_TIME_STATE, CPU_SCALING_GOVERNOR,
             CPU_AVAILABLE_GOVERNORS, CPU_GOVERNOR_TUNABLES, CPU_GOVERNOR_TUNABLES_CORE, CPU_MC_POWER_SAVING, CPU_WQ_POWER_SAVING,
-            CPU_AVAILABLE_CFS_SCHEDULERS, CPU_CURRENT_CFS_SCHEDULER, CPU_QUIET, CPU_BOOST, CPU_TOUCH_BOOST, STATE_NOTIFIER};
+            CPU_AVAILABLE_CFS_SCHEDULERS, CPU_CURRENT_CFS_SCHEDULER, CPU_QUIET, CPU_BOOST, CPU_TOUCH_BOOST,
+            STATE_NOTIFIER, STATE_HELPER};
 
     // CPU Voltage
     String CPU_VOLTAGE = "/sys/devices/system/cpu/cpu0/cpufreq/UV_mV_table";
@@ -301,15 +312,6 @@ public interface Constants {
     String MSM_SLEEPER_UP_COUNT_MAX = MSM_SLEEPER + "/up_count_max";
     String MSM_SLEEPER_DOWN_COUNT_MAX = MSM_SLEEPER + "/down_count_max";
 
-    String STATE_HELPER = "/sys/kernel/state_helper";
-    String STATE_HELPER_ENABLE = STATE_HELPER + "/enabled";
-    String STATE_HELPER_MAX_CPUS_ONLINE = STATE_HELPER + "/max_cpus_online";
-    String STATE_HELPER_MAX_CPUS_SUSPEND = STATE_HELPER + "/max_cpus_susp";
-    String STATE_HELPER_BATT_LEVEL_ECO = STATE_HELPER + "/batt_level_eco";
-    String STATE_HELPER_BATT_LEVEL_CRI = STATE_HELPER + "/batt_level_cri";
-    String STATE_HELPER_MAX_CPU_ECO = STATE_HELPER + "/max_cpus_eco";
-    String STATE_HELPER_MAX_CPU_CRI = STATE_HELPER + "/max_cpus_cri";
-
     // Hima Hotplug
     String HIMA_HOTPLUG = "/sys/kernel/hima_hotplug";
     String HIMA_HOTPLUG_ENABLE = HIMA_HOTPLUG + "/hima_hotplug_active";
@@ -318,7 +320,7 @@ public interface Constants {
     String HIMA_HOTPLUG_MAX_CPUS_ONLINE = HIMA_HOTPLUG + "/max_cpus_online";
     String HIMA_HOTPLUG_DEF_SAMPLING_MS = HIMA_HOTPLUG + "/def_sampling_ms";
 
-    String[][] CPU_HOTPLUG_ARRAY = {{HOTPLUG_MPDEC, MSM_SLEEPER, STATE_HELPER, MSMPERFORMANCE, BCH, HIMA_HOTPLUG}, INTELLIPLUG_ARRAY, BLU_PLUG_ARRAY, HOTPLUG_MSM_ARRAY, MAKO_HOTPLUG_ARRAY,
+    String[][] CPU_HOTPLUG_ARRAY = {{HOTPLUG_MPDEC, MSM_SLEEPER, MSMPERFORMANCE, BCH, HIMA_HOTPLUG}, INTELLIPLUG_ARRAY, BLU_PLUG_ARRAY, HOTPLUG_MSM_ARRAY, MAKO_HOTPLUG_ARRAY,
             MB_HOTPLUG_ARRAY, ALUCARD_HOTPLUG_ARRAY, HOTPLUG_THUNDER_PLUG_ARRAY, HOTPLUG_ZEN_DECISION_ARRAY, HOTPLUG_AUTOSMP_ARRAY, HOTPLUG_LAZYPLUG_ARRAY, DYN_PLUG_ARRAY, AUTO_HOTPLUG_ARRAY};
 
     // Thermal

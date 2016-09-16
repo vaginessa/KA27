@@ -108,6 +108,7 @@
     <!-- CPU -->
     <string name="cpu_usage">CPU Usage</string>
     <string name="cpu_temp">CPU Temperature</string>
+    <string name="cpu_extra">CPU Efficiency Flags</string>
     <string name="current_freq">Current Frequency</string>
     <string name="core">Core %d</string>
     <string name="offline">Offline</string>
@@ -331,7 +332,8 @@
     <string name="bricked_twts_unplug">This amount of time must have passed for CPU%d to be unplugged.</string>
     <string name="bricked_time_threshold">Time Threshold</string>
     <string name="state_helper">State Helper</string>
-    <string name="state_helper_summary">A new hotplug by Neobuddy89</string>
+    <string name="state_helper_description">A new control driver by Neobuddy89.\n\nThe idea is to maintain the device state without adding any overhead of sampling.\n\n Be Aware:\nEnabling more then two core below 15% of battery can pull too much current and cause the device to automatic shutdown without warning, after it shutdown only turn it on after you have plug the charger.\n\n This is need to prevent the battery to lose full charge capacity.</string>
+    <string name="state_helper_summary">Enable to see the tunables</string>
     <string name="state_helper_max_cpus_online">Maximum number of CPUs onlined while screen on.</string>
     <string name="state_helper_max_cpus_suspend">Maximum number of CPUs onlined while screen off.</string>
     <string name="state_helper_batt_level_eco">Battery Level Economical</string>
@@ -728,9 +730,11 @@
     <string name="gentlefairsleepers_summary">Only give sleepers 50% of their service deficit. Disabling this can save a little battery power.</string>
     <string name="power_suspend_mode">Power Suspend Mode</string>
     <string name="power_suspend_mode_summary">Kernel Mode, LCD Hooks and Highest Level Hook are automatically managed by the kernel. To manually enable or disable the Power Suspend State choose User Mode.</string>
+    <string name="state_notifier">State Notifier</string>
+    <string name="state_notifier_summary">A new state notifier driver by Neobuddy89.\n\nDesign to improve communication between driver and suspend/resume routine.</string>
     <string name="state_notifier_mode">State Notifier Mode</string>
-    <string name="state_notifier_mode_summary_enabled">Toggle between State and FB Notifiers. \nCurrently: State Notifier</string>
-    <string name="state_notifier_mode_summary_disabled">Toggle between State and FB Notifiers. \nCurrently: FB Notifier</string>
+    <string name="state_notifier_mode_summary_enabled">Enable to see tunable.\nToggle between State and FB Notifiers.\n\nCurrently: State Notifier</string>
+    <string name="state_notifier_mode_summary_disabled">Enable to see tunable.\nToggle between State and FB Notifiers.\n\nCurrently: FB Notifier</string>
     <string name="state_defer">State Notifier Suspended Defer Time</string>
     <string name="state_defer_summary">When suspended, prevents suspend routines wait X seconds to prevent false/very short suspend calls.(default 10sec)</string>
     <string name="autosleep">Autosleep</string>
