@@ -29,13 +29,13 @@ public class Buildprop implements Constants {
 
     public static void overwrite(String oldKey, String oldValue, String newKey, String newValue) {
         RootUtils.mount(true, "/system");
-        RootUtils.runCommand("toybox sed -ir \"s/" + oldKey+ "=" + oldValue + "/" + newKey + "=" + newValue + "/\" "  + BUILD_PROP);
+        RootUtils.runCommand("sed -ir \"s/" + oldKey+ "=" + oldValue + "/" + newKey + "=" + newValue + "/\" "  + BUILD_PROP);
     }
 
     public static void delete(String key) {
         if (!key.isEmpty()) {
             RootUtils.mount(true, "/system");
-            RootUtils.runCommand(getBox() + " sed -ir \"/" + key + "=/d\" " + BUILD_PROP);
+            RootUtils.runCommand("sed -ir \"/" + key + "=/d\" " + BUILD_PROP);
         }
     }
 
