@@ -7,6 +7,13 @@
         <item>@string/no_picture</item>
     </string-array>
 
+    <!-- CPU -->
+    <string-array name="mc_power_saving_items">
+        <item>@string/disabled</item>
+        <item>@string/enabled</item>
+        <item>@string/aggressive</item>
+    </string-array>
+
     <!-- CPU Hotplug -->
     <string-array name="thunderplug_endurance_level_items">
         <item>@string/disabled</item>
@@ -38,8 +45,6 @@
         <item>@string/empty_app</item>
     </string-array>
     <string-array name="lmk_profiles">
-        <item>@string/bhb27_recommended</item>
-        <item>@string/moto_default</item>
         <item>@string/very_light</item>
         <item>@string/light</item>
         <item>@string/medium</item>
@@ -73,6 +78,12 @@
         <item>@string/userspace</item>
         <item>@string/lcd_panel</item>
         <item>@string/hybrid</item>
+    </string-array>
+
+    <!-- Recovery -->
+    <string-array name="recovery_variants">
+        <item>@string/cwm_recovery</item>
+        <item>@string/twrp</item>
     </string-array>
 
     <!-- Initd -->
