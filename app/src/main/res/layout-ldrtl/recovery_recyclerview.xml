@@ -11,6 +11,16 @@
         android:background="@color/color_primary"
         android:orientation="horizontal">
 
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/recovery_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingEnd="16dp"
+            android:paddingLeft="72dp"
+            android:paddingRight="16dp"
+            android:paddingStart="72dp" />
+
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -26,8 +36,10 @@
         android:id="@+id/fab_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/background_view"
+        android:layout_marginLeft="7dp"
         android:layout_marginStart="7dp"
         android:layout_marginTop="-26dp"
         fab:fab_addButtonColorNormal="@color/fab_normal"
@@ -44,7 +56,6 @@
             android:layout_height="wrap_content"
             fab:fab_colorNormal="@color/fab_normal_menu"
             fab:fab_colorPressed="@color/fab_pressed_menu"
-            fab:fab_icon="@drawable/ic_wipe"
             fab:fab_size="mini"
             fab:fab_title="@string/wipe_data" />
 
@@ -54,7 +65,6 @@
             android:layout_height="wrap_content"
             fab:fab_colorNormal="@color/fab_normal_menu"
             fab:fab_colorPressed="@color/fab_pressed_menu"
-            fab:fab_icon="@drawable/ic_wipe"
             fab:fab_size="mini"
             fab:fab_title="@string/wipe_cache" />
 
