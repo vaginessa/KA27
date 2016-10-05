@@ -156,6 +156,7 @@ public class ViewPagerFragment extends BaseFragment {
             items.add(item);
             adapter.notifyDataSetChanged();
         }
+
         if (!items.isEmpty() && isVisible() && mTabs != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
