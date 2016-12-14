@@ -22,6 +22,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -53,6 +54,7 @@ import com.grarak.kerneladiutor.elements.SplashView;
 import com.grarak.kerneladiutor.fragments.BaseFragment;
 import com.grarak.kerneladiutor.fragments.information.FrequencyTableFragment;
 import com.grarak.kerneladiutor.fragments.information.KernelInformationFragment;
+import com.grarak.kerneladiutor.fragments.information.SystemStatusFragment;
 import com.grarak.kerneladiutor.fragments.kernel.BatteryFragment;
 import com.grarak.kerneladiutor.fragments.kernel.CPUFragment;
 import com.grarak.kerneladiutor.fragments.kernel.CPUHotplugFragment;
@@ -127,6 +129,11 @@ public class MainActivity extends BaseActivity implements Constants {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+	// Current CPUInfoService only works if the app is a system app
+	boolean isSystemApp = (getApplicationInfo().flags &
+	    (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0;
+	Utils.saveBoolean("is_system", isSystemApp, this);
 
         setView();
         String password;
@@ -218,6 +225,8 @@ public class MainActivity extends BaseActivity implements Constants {
         ITEMS.add(new DAdapter.Header(getString(R.string.information)));
         ITEMS.add(new DAdapter.Item(getString(R.string.kernel_information), new KernelInformationFragment()));
         ITEMS.add(new DAdapter.Item(getString(R.string.frequency_table), new FrequencyTableFragment()));
+	if (Utils.getBoolean("is_system", true, this))
+	        ITEMS.add(new DAdapter.Item(getString(R.string.status_overlay), new SystemStatusFragment()));
         ITEMS.add(new DAdapter.Header(getString(R.string.kernel)));
         ITEMS.add(new DAdapter.Item(getString(R.string.cpu), new CPUFragment()));
         if (CPUVoltage.hasCpuVoltage())

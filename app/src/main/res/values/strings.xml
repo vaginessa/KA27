@@ -60,6 +60,7 @@
     <string name="downloads">Downloads</string>
     <string name="kernel_information">Kernel Information</string>
     <string name="frequency_table">Frequency Table</string>
+    <string name="status_overlay">Status Overlay</string>
     <string name="cpu">CPU</string>
     <string name="cpu_voltage">CPU Voltage</string>
     <string name="cpu_hotplug">CPU Hotplug</string>
@@ -106,6 +107,9 @@
     <string name="kernel_version">Kernel Version</string>
     <string name="cpu_information">CPU Information</string>
     <string name="memory_information">Memory Information</string>
+
+    <!-- System Overlay -->
+    <string name="status_overlay_summary">Screen overlay to show current system status, Cpu and Gpu frequency, governor and temperature + etc</string>
 
     <!-- CPU -->
     <string name="cpu_usage">CPU Usage</string>
