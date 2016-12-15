@@ -18,8 +18,6 @@ package com.grarak.kerneladiutor.utils.kernel;
 import android.content.Context;
 import android.content.Intent;
 
-import java.util.Locale;
-
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
@@ -45,17 +43,5 @@ public class SystemStatus implements Constants {
             context.startService(new Intent(context, CPUInfoService.class));
         else
             context.stopService(new Intent(context, CPUInfoService.class));
-
     }
-
-    public static String getTemp(int zone) {
-        String zoned = String.format(Locale.US, CPU_TEMP_ZONED, zone);
-        if (!Utils.existFile(zoned)) return "";
-        double temp = Utils.stringToLong(Utils.readFile(zoned));
-        if (temp > 1000) temp /= 1000;
-        else if (temp > 200) temp /= 10;
-        return Utils.formatCelsius(temp);
-	//+ " " + Utils.celsiusToFahrenheit(temp)
-    }
-
 }
