@@ -36,8 +36,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
+import java.util.Locale;
 import java.lang.StringBuffer;
+
+import com.grarak.kerneladiutor.R;
+import com.grarak.kerneladiutor.utils.kernel.CPU;
+import com.grarak.kerneladiutor.utils.kernel.GPU;
+import com.grarak.kerneladiutor.utils.Utils;
+import com.grarak.kerneladiutor.utils.kernel.SystemStatus;
 
 public class CPUInfoService extends Service {
     private View mView;
@@ -146,7 +152,7 @@ public class CPUInfoService extends Service {
             float descent = mOnlinePaint.descent();
             mFH = (int)(descent - mAscent + .5f);
 
-            final String maxWidthStr = "cpuX xxxxxxxxxxxxxx 1700000";
+            final String maxWidthStr = "GPU: simple_ondemand: 2800MHz T=30.1C"; // probably biggest possible 
             mMaxWidth = (int) mOnlinePaint.measureText(maxWidthStr);
 
             updateDisplay();
@@ -172,7 +178,7 @@ public class CPUInfoService extends Service {
         private String getCPUInfoString(int i) {
             String freq = mCurrFreq[i];
             String gov = mCurrGov[i];
-            return "cpu:" + i + " " + gov + ":" + freq;
+            return "CORE:" + i + " " + gov + ":" + freq;
         }
 
         @Override
@@ -191,7 +197,7 @@ public class CPUInfoService extends Service {
 
             int y = mPaddingTop - (int) mAscent;
 
-            canvas.drawText("Temp:" + mCPUTemp, RIGHT - mPaddingRight - mMaxWidth,
+            canvas.drawText(mCPUTemp, RIGHT - mPaddingRight - mMaxWidth,
                 y - 1, mOnlinePaint);
             y += mFH;
 
@@ -267,27 +273,19 @@ public class CPUInfoService extends Service {
                 while (!mInterrupt) {
                     sleep(500);
                     StringBuffer sb = new StringBuffer();
-                    String cpuTemp = CPUInfoService.readOneLine(CPU_TEMP_HTC);
-                    if (cpuTemp == null) {
-                        cpuTemp = CPUInfoService.readOneLine(CPU_TEMP_OPPO);
-                    }
-                    sb.append(cpuTemp == null ? "0" : cpuTemp);
+                    sb.append(" ");
                     sb.append(";");
                     String lpMode = CPUInfoService.readOneLine(CPU_LP_MODE);
                     sb.append(lpMode == null ? "0" : lpMode);
                     sb.append(";");
 
                     for (int i = 0; i < mNumCpus; i++) {
-                        final String freqFile = CPU_ROOT + i + CPU_CUR_TAIL;
-                        String currFreq = CPUInfoService.readOneLine(freqFile);
-                        final String govFile = CPU_ROOT + i + CPU_GOV_TAIL;
-                        String currGov = CPUInfoService.readOneLine(govFile);
-
-                        if (currFreq == null) {
-                            currFreq = "0";
-                            currGov = "";
-                        }
-
+                        String currFreq = CPU.getCurFreq(i) / 1000 + getString(R.string.mhz);
+			String currGov = "";
+                        if (!currFreq.equals("0" + getString(R.string.mhz))) {
+                            currGov = CPU.getCurGovernor(i, false);
+                            currFreq = currFreq + " T " + SystemStatus.getTemp(i + 6);
+			}
                         sb.append(currFreq + ":" + currGov + "|");
                     }
                     sb.deleteCharAt(sb.length() - 1);
@@ -308,13 +306,13 @@ public class CPUInfoService extends Service {
 
         mView = new CPUView(this);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT);
-        params.gravity = Gravity.RIGHT | Gravity.TOP;
+        params.gravity = Gravity.START | Gravity.TOP;
         params.setTitle("CPU Info");
 
         mCurCPUThread = new CurCPUThread(mView.getHandler(), mNumCpus);
