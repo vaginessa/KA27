@@ -44,6 +44,7 @@ public interface Constants {
     String CPU_CUR_FREQ = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq";
     String CPU_TEMP_ZONE0 = "/sys/class/thermal/thermal_zone0/temp";
     String CPU_TEMP_ZONE1 = "/sys/class/thermal/thermal_zone1/temp";
+    String CPU_TEMP_ZONED = "/sys/class/thermal/thermal_zone%d/temp";
     String CPU_CORE_ONLINE = "/sys/devices/system/cpu/cpu%d/online";
     String CPU_MAX_FREQ = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq";
     String CPU_MAX_FREQ_KT = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq_kt";
