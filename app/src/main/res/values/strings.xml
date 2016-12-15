@@ -110,6 +110,7 @@
 
     <!-- System Overlay -->
     <string name="status_overlay_summary">Screen overlay to show current system status, Cpu and Gpu frequency, governor and temperature + etc</string>
+    <string name="status_overlay_notification">Status Overlay is Running&#8230;</string>
 
     <!-- CPU -->
     <string name="cpu_usage">CPU Usage</string>

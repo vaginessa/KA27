@@ -15,6 +15,9 @@
  */
 package com.grarak.kerneladiutor.services;
 
+import android.app.NotificationManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +29,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -37,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.grarak.kerneladiutor.MainActivity;
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.utils.kernel.CPU;
 import com.grarak.kerneladiutor.utils.kernel.GPU;
@@ -50,6 +55,7 @@ public class CPUInfoService extends Service {
     private Thread mCurCPUThread;
     private final String TAG = "CPUInfoService";
     private PowerManager mPowerManager;
+    private WakeLock mWakeLock;
     private int mNumCpus = 1;
     private String[] mCurrFreq = null;
     private String[] mCurrGov = null;
@@ -226,31 +232,21 @@ public class CPUInfoService extends Service {
         public void run() {
             try {
                 while (!mInterrupt) {
-                    sleep(500);
+                    sleep(400);
                     StringBuffer sb = new StringBuffer();
-                    String batTemp = SystemStatus.getTemp(0);
-                    String cpuTemp = SystemStatus.getTemp(1);
-                    batTemp = "Temp - BAT: " + (batTemp.equals("") ? "0" : batTemp);
-                    cpuTemp = "CPU: " + (cpuTemp.equals("") ? "0" : cpuTemp);
-                    sb.append(batTemp + " - " + cpuTemp);
+                    sb.append("Temp - BAT: " + SystemStatus.getTemp(0) + " - CPU: " + SystemStatus.getTemp(1));
                     sb.append(";");
-                    if (GPU.hasGpuGovernor() && GPU.hasGpuCurFreq()) {
-                        String currGpuFreq = ((GPU.getGpuCurFreq() / 1000000) + getString(R.string.mhz));
-                        String currGpuGov = GPU.getGpuGovernor();
-                        String GPUTemp = SystemStatus.getTemp(10);
-                        GPUTemp = " T: " + (GPUTemp.equals("") ? "0" : GPUTemp);
-                        sb.append(currGpuGov + ":" + currGpuFreq + GPUTemp);
-                    }
+                    sb.append(SystemStatus.getGpuGovernor() + ":" + SystemStatus.getGpuCurFreq() + getString(R.string.mhz) + " T " + SystemStatus.getTemp(10));
                     sb.append(";");
 
                     for (int i = 0; i < mNumCpus; i++) {
+                        int IcurrFreq = SystemStatus.getCurFreq(i) / 1000;
                         String currGov = "";
-                        String coreTemp = SystemStatus.getTemp(i + 6);
-                        coreTemp = " T " + (coreTemp.equals("") ? "0" : coreTemp);
-                        String currFreq = CPU.getCurFreq(i) / 1000 + getString(R.string.mhz) + coreTemp;
-                        if (!currFreq.equals("0" + getString(R.string.mhz)))
-                            currGov = CPU.getCurGovernor(i, false);
-
+                        String currFreq = "0";
+                        if (IcurrFreq != 0) {
+                            currGov = SystemStatus.getCurGovernor(i);
+                            currFreq = IcurrFreq + getString(R.string.mhz) + " T " + SystemStatus.getTemp(i + 6);
+                        }
                         sb.append(currFreq + ":" + currGov + "|");
                     }
                     sb.deleteCharAt(sb.length() - 1);
@@ -265,7 +261,16 @@ public class CPUInfoService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mNumCpus = CPU.getCoreCount();
+
+        mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+
+        WakeLock mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, getClass().getName());
+        if (mWakeLock != null) {
+            if (mWakeLock.isHeld() == false) {
+                mWakeLock.acquire();
+            }
+        }
+        mNumCpus = Runtime.getRuntime().availableProcessors();
         mCurrFreq = new String[mNumCpus];
         mCurrGov = new String[mNumCpus];
 
@@ -278,8 +283,8 @@ public class CPUInfoService extends Service {
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT);
         //params.gravity = Gravity.END | Gravity.TOP;
-        //params.gravity = Gravity.START | Gravity.TOP;
-        params.gravity = Gravity.TOP;
+        params.gravity = Gravity.START | Gravity.TOP;
+        //params.gravity = Gravity.TOP;
         //params.gravity = Gravity.START | Gravity.BOTTOM;
         //params.gravity = Gravity.END | Gravity.BOTTOM; //can't be used because Android Touch-Event Hijacking
         //params.gravity = Gravity.BOTTOM;
@@ -295,8 +300,32 @@ public class CPUInfoService extends Service {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        Notification notification = new Notification.Builder(this)
+            .setSmallIcon(R.drawable.ic_launcher_preview)
+              .setContentTitle(getString(R.string.status_overlay))
+            .setContentText(getString(R.string.status_overlay_notification))
+            .setContentIntent(pendingIntent).build();
+
+        startForeground(101, notification);
+        return (START_NOT_STICKY);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mWakeLock != null) {
+            if (mWakeLock.isHeld()) {
+                mWakeLock.release();
+                mWakeLock = null;
+            }
+        }
+
         if (mCurCPUThread.isAlive()) {
             mCurCPUThread.interrupt();
             try {
@@ -306,6 +335,7 @@ public class CPUInfoService extends Service {
         Log.d(TAG, "stopped CurCPUThread");
         ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(mView);
         mView = null;
+        stopForeground(true);
     }
 
     @Override

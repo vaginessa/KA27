@@ -382,7 +382,7 @@ public class Utils implements Constants {
     }
 
     public static String celsiusToFahrenheit(double celsius) {
-        return round(celsius * 9 / 5 + 32, 2) + "°F";
+        return round(celsius * 9 / 5 + 32,2) + "°F";
     }
 
     public static String round(double value, int places) {

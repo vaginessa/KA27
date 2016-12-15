@@ -50,12 +50,34 @@ public class SystemStatus implements Constants {
 
     public static String getTemp(int zone) {
         String zoned = String.format(Locale.US, CPU_TEMP_ZONED, zone);
-        if (!Utils.existFile(zoned)) return "";
-        double temp = Utils.stringToLong(Utils.readFile(zoned));
+        int temp = Utils.stringToInt(Utils.readFile(zoned));
         if (temp > 1000) temp /= 1000;
         else if (temp > 200) temp /= 10;
-        return Utils.formatCelsius(temp);
-	//+ " " + Utils.celsiusToFahrenheit(temp)
+	return String.valueOf(temp) + "°C";
+	//return String.valueOf(temp* 9 / 5 + 32,2) + "°F";
     }
 
+    public static int getGpuCurFreq() {
+        String value = Utils.readFile(GPU_CUR_FDB00000_QCOM_FREQ);
+        if (value != null) return ((int) Utils.stringToInt(value) / 1000000);
+        return 0;
+    }
+
+    public static String getGpuGovernor() {
+        String value = Utils.readFile(GPU_SCALING_FDB00000_QCOM_GOVERNOR);
+        if (value != null) return value;
+        return "";
+    }
+
+    public static String getCurGovernor(int core) {
+        String value = Utils.readFile(String.format(Locale.US, CPU_SCALING_GOVERNOR, core));
+        if (value != null) return value;
+        return "";
+    }
+
+    public static int getCurFreq(int core) {
+        String value = Utils.readFile(String.format(Locale.US, CPU_CUR_FREQ, core));
+        if (value != null) return Utils.stringToInt(value);
+        return 0;
+    }
 }
