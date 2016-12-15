@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.grarak.kerneladiutor.services;
 
 import android.content.BroadcastReceiver;
@@ -29,16 +30,11 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
-        String action = intent.getAction();
-
-        if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
-            if (Utils.getBoolean("emulateinit.d", false, context))
-                context.startService(new Intent(context, InitdService.class));
-            context.startService(new Intent(context, BootService.class));
-            if (SystemStatus.isCPUInfoServiceEnable(context))
-                context.startService(new Intent(context, CPUInfoService.class));
-        }
+        if (Utils.getBoolean("emulateinit.d", false, context))
+            context.startService(new Intent(context, InitdService.class));
+        context.startService(new Intent(context, BootService.class));
+        if (SystemStatus.isCPUInfoServiceEnable(context))
+            context.startService(new Intent(context, CPUInfoService.class));
     }
 
 }
