@@ -36,12 +36,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Locale;
 
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.utils.kernel.CPU;
 import com.grarak.kerneladiutor.utils.kernel.GPU;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.kernel.SystemStatus;
+import com.kerneladiutor.library.root.RootFile;
+import com.kerneladiutor.library.root.RootUtils;
+import com.grarak.kerneladiutor.utils.Constants;
 
 import java.lang.StringBuffer;
 
@@ -228,19 +232,21 @@ public class CPUInfoService extends Service {
                 while (!mInterrupt) {
                     sleep(500);
                     StringBuffer sb = new StringBuffer();
-                    sb.append("Temp - BAT: " + SystemStatus.getTemp(0) + " - CPU: " + SystemStatus.getTemp(1)); 
+                    sb.append("Temp - BAT: " + CPUInfoService.readOneLine(String.format(Locale.US, Constants.CPU_TEMP_ZONED, 0), true) + " - CPU: " + CPUInfoService.readOneLine(String.format(Locale.US, Constants.CPU_TEMP_ZONED, 1), true)); 
                     sb.append(";");
-                    sb.append(SystemStatus.getGpuGovernor() + ":" + SystemStatus.getGpuCurFreq() + getString(R.string.mhz) + " T " + SystemStatus.getTemp(10));
+                    sb.append(CPUInfoService.readOneLine(Constants.GPU_SCALING_FDB00000_QCOM_GOVERNOR, true) + ":" + CPUInfoService.readOneLine(Constants.GPU_CUR_FDB00000_QCOM_FREQ, true) + getString(R.string.mhz) + " T " + CPUInfoService.readOneLine(String.format(Locale.US, Constants.CPU_TEMP_ZONED, 10), true));
                     sb.append(";");
 
                     for (int i = 0; i < mNumCpus; i++) {
                         String currGov = "";
-                        String currFreq = "0";
-                        int IcurrFreq = SystemStatus.getCurFreq(i) / 1000;
-                        if (IcurrFreq != 0) {
-                            currGov = SystemStatus.getCurGovernor(i);
-                            currFreq = IcurrFreq + getString(R.string.mhz) + " T " + SystemStatus.getTemp(i + 6);
-                        }
+                        String currFreq = CPUInfoService.readOneLine(String.format(Locale.US, Constants.CPU_CUR_FREQ, i), true);
+                        if (currFreq == null) {
+                            currFreq = "0";
+                            currGov = "";
+                        } else {
+                            currGov = CPUInfoService.readOneLine(String.format(Locale.US, Constants.CPU_SCALING_GOVERNOR, i), true);
+                            currFreq = currFreq + getString(R.string.mhz) + " T " + CPUInfoService.readOneLine((String.format(Locale.US, Constants.CPU_TEMP_ZONED, i + 6)), true);
+			}
                         sb.append(currFreq + ":" + currGov + "|");
                     }
                     sb.deleteCharAt(sb.length() - 1);
@@ -303,4 +309,21 @@ public class CPUInfoService extends Service {
         return null;
     }
 
+    private static String readOneLine(String fname, boolean asRoot) {
+        if (asRoot) return new RootFile(fname).readFile();
+
+        BufferedReader br;
+        String line = null;
+        try {
+            br = new BufferedReader(new FileReader(fname), 512);
+            try {
+                line = br.readLine();
+            } finally {
+                br.close();
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return line;
+    }
 }

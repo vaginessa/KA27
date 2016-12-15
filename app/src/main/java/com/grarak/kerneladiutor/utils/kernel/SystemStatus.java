@@ -50,6 +50,7 @@ public class SystemStatus implements Constants {
 
     public static String getTemp(int zone) {
         String zoned = String.format(Locale.US, CPU_TEMP_ZONED, zone);
+        if (!Utils.existFile(zoned)) return "";
         int temp = Utils.stringToInt(Utils.readFile(zoned));
         if (temp > 1000) temp /= 1000;
         else if (temp > 200) temp /= 10;
@@ -58,24 +59,28 @@ public class SystemStatus implements Constants {
     }
 
     public static int getGpuCurFreq() {
+	if (!Utils.existFile(GPU_CUR_FDB00000_QCOM_FREQ)) return 0;
         String value = Utils.readFile(GPU_CUR_FDB00000_QCOM_FREQ);
         if (value != null) return ((int) Utils.stringToInt(value) / 1000000);
         return 0;
     }
 
     public static String getGpuGovernor() {
+	if (!Utils.existFile(GPU_SCALING_FDB00000_QCOM_GOVERNOR)) return "";
         String value = Utils.readFile(GPU_SCALING_FDB00000_QCOM_GOVERNOR);
         if (value != null) return value;
         return "";
     }
 
     public static String getCurGovernor(int core) {
+	if (!Utils.existFile(String.format(Locale.US, CPU_SCALING_GOVERNOR, core))) return "";
         String value = Utils.readFile(String.format(Locale.US, CPU_SCALING_GOVERNOR, core));
         if (value != null) return value;
         return "";
     }
 
     public static int getCurFreq(int core) {
+	if (!Utils.existFile(String.format(Locale.US, CPU_CUR_FREQ, core))) return 0;
         String value = Utils.readFile(String.format(Locale.US, CPU_CUR_FREQ, core));
         if (value != null) return Utils.stringToInt(value);
         return 0;
