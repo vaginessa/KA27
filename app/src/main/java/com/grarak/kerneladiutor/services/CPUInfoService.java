@@ -228,29 +228,19 @@ public class CPUInfoService extends Service {
                 while (!mInterrupt) {
                     sleep(500);
                     StringBuffer sb = new StringBuffer();
-                    String batTemp = SystemStatus.getTemp(0);
-                    String cpuTemp = SystemStatus.getTemp(1);
-                    batTemp = "Temp - BAT: " + (batTemp.equals("") ? "0" : batTemp);
-                    cpuTemp = "CPU: " + (cpuTemp.equals("") ? "0" : cpuTemp);
-                    sb.append(batTemp + " - " + cpuTemp);
+                    sb.append("Temp - BAT: " + SystemStatus.getTemp(0) + " - CPU: " + SystemStatus.getTemp(1)); 
                     sb.append(";");
-                    if (GPU.hasGpuGovernor() && GPU.hasGpuCurFreq()) {
-                        String currGpuFreq = ((GPU.getGpuCurFreq() / 1000000) + getString(R.string.mhz));
-                        String currGpuGov = GPU.getGpuGovernor();
-                        String GPUTemp = SystemStatus.getTemp(10);
-                        GPUTemp = " T: " + (GPUTemp.equals("") ? "0" : GPUTemp);
-                        sb.append(currGpuGov + ":" + currGpuFreq + GPUTemp);
-                    }
+                    sb.append(SystemStatus.getGpuGovernor() + ":" + SystemStatus.getGpuCurFreq() + getString(R.string.mhz) + " T " + SystemStatus.getTemp(10));
                     sb.append(";");
 
                     for (int i = 0; i < mNumCpus; i++) {
                         String currGov = "";
-                        String coreTemp = SystemStatus.getTemp(i + 6);
-                        coreTemp = " T " + (coreTemp.equals("") ? "0" : coreTemp);
-                        String currFreq = CPU.getCurFreq(i) / 1000 + getString(R.string.mhz) + coreTemp;
-                        if (!currFreq.equals("0" + getString(R.string.mhz)))
-                            currGov = CPU.getCurGovernor(i, false);
-
+                        String currFreq = "0";
+                        int IcurrFreq = SystemStatus.getCurFreq(i) / 1000;
+                        if (IcurrFreq != 0) {
+                            currGov = SystemStatus.getCurGovernor(i);
+                            currFreq = IcurrFreq + getString(R.string.mhz) + " T " + SystemStatus.getTemp(i + 6);
+                        }
                         sb.append(currFreq + ":" + currGov + "|");
                     }
                     sb.deleteCharAt(sb.length() - 1);
@@ -278,8 +268,8 @@ public class CPUInfoService extends Service {
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT);
         //params.gravity = Gravity.END | Gravity.TOP;
-        //params.gravity = Gravity.START | Gravity.TOP;
-        params.gravity = Gravity.TOP;
+        params.gravity = Gravity.START | Gravity.TOP;
+        //params.gravity = Gravity.TOP;
         //params.gravity = Gravity.START | Gravity.BOTTOM;
         //params.gravity = Gravity.END | Gravity.BOTTOM; //can't be used because Android Touch-Event Hijacking
         //params.gravity = Gravity.BOTTOM;
